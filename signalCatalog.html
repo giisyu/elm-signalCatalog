@@ -4363,7 +4363,7 @@ Elm.Main.make = function (_elm) {
             case "Nothing":
             return $Task.fail("");}
          _U.badCase($moduleName,
-         "between lines 508 and 510");
+         "between lines 511 and 513");
       }();
    },
    $Signal$Stream.fromSignal(clickCount)));
@@ -4383,7 +4383,7 @@ Elm.Main.make = function (_elm) {
             case "Nothing":
             return $Task.fail("");}
          _U.badCase($moduleName,
-         "between lines 512 and 514");
+         "between lines 515 and 517");
       }();
    },
    $Signal$Stream.fromSignal(clickCount)));
@@ -4406,6 +4406,13 @@ Elm.Main.make = function (_elm) {
                          ,italic: false
                          ,line: $Maybe.Nothing
                          ,typeface: _L.fromArray(["monospace"])};
+   var typeReferenceStyle = {_: {}
+                            ,bold: true
+                            ,color: A3($Color.rgb,255,85,85)
+                            ,height: $Maybe.Just(15)
+                            ,italic: false
+                            ,line: $Maybe.Nothing
+                            ,typeface: _L.fromArray(["monospace"])};
    var titleStyle = {_: {}
                     ,bold: true
                     ,color: $Color.black
@@ -4413,6 +4420,21 @@ Elm.Main.make = function (_elm) {
                     ,italic: false
                     ,line: $Maybe.Nothing
                     ,typeface: _L.fromArray(["monospace"])};
+   var code = function (codeStr) {
+      return function () {
+         var format = function (string) {
+            return $Graphics$Element.color(A3($Color.rgb,
+            255,
+            255,
+            255))($Graphics$Element.justified($Text.monospace($Text.fromString(string))));
+         };
+         return $Signal.constant(A2($Graphics$Element.beside,
+         A2($Graphics$Element.spacer,
+         5,
+         5),
+         format(codeStr)));
+      }();
+   };
    var timeLineView = function (lineStr) {
       return function () {
          var format = function (string) {
@@ -4487,6 +4509,14 @@ Elm.Main.make = function (_elm) {
       titleStyle,
       str);
    };
+   var typeReference = function (str) {
+      return A5(toSignalElement,
+      3,
+      70,
+      3,
+      typeReferenceStyle,
+      str);
+   };
    var reference$ = function (str) {
       return A5(toSignalElement,
       3,
@@ -4513,41 +4543,6 @@ Elm.Main.make = function (_elm) {
    255,
    255,
    255);
-   var code = function (codeStr) {
-      return function () {
-         var format = function (string) {
-            return $Graphics$Element.color(codeBackColor)($Graphics$Element.justified($Text.monospace($Text.fromString(string))));
-         };
-         return $Signal.constant(A2($Graphics$Element.beside,
-         A2($Graphics$Element.spacer,
-         5,
-         5),
-         format(codeStr)));
-      }();
-   };
-   var typeFontColor = A3($Color.rgb,
-   255,
-   85,
-   85);
-   var typeReferenceStyle = {_: {}
-                            ,bold: true
-                            ,color: typeFontColor
-                            ,height: $Maybe.Just(15)
-                            ,italic: false
-                            ,line: $Maybe.Nothing
-                            ,typeface: _L.fromArray(["monospace"])};
-   var typeReference = function (str) {
-      return A5(toSignalElement,
-      3,
-      70,
-      3,
-      typeReferenceStyle,
-      str);
-   };
-   var titleFontColor = A3($Color.rgb,
-   0,
-   0,
-   0);
    var timefps = $Time.fps(15);
    var Act = function (a) {
       return {ctor: "Act",_0: a};
@@ -4573,7 +4568,7 @@ Elm.Main.make = function (_elm) {
                     state,
                     "-"));}
                _U.badCase($moduleName,
-               "between lines 47 and 52");
+               "between lines 39 and 44");
             }();
          });
          var addTimeSignal = function (signal) {
@@ -4668,13 +4663,13 @@ Elm.Main.make = function (_elm) {
    mouseClick,
    clickCount);
    var filterDemo = A5(line2,
-   "foldp : (a -> state -> state) -> state -> Signal a -> Signal state",
+   "filter : (a -> Bool) -> a -> Signal a -> Signal a",
    "clickCount = Signal.foldp (\\x y -> y + 1 ) 0 Mouse.clicks",
    "multiplesOf3 = Signal.filter (\\x -> if x % 3 == 0 then True else False ) 6 clickCount",
    clickCount,
    multiplesOf3);
    var dropRepeatsDemo = A5(line2,
-   "foldp : (a -> state -> state) -> state -> Signal a -> Signal state",
+   "dropRepeats : Signal a -> Signal a",
    "Time.since (1 * second) Mouse.clicks",
    "Signal.dropRepeats sinceTest",
    sinceTest,
@@ -4791,7 +4786,7 @@ Elm.Main.make = function (_elm) {
    countTime,
    map2Test);
    var mergeDemo = A7(line3,
-   "foldp : (a -> state -> state) -> state -> Signal a -> Signal state",
+   "merge : Signal a -> Signal a -> Signal a",
    "Mouse.isDown",
    "Keyboard.enter",
    "Signal.merge Mouse.isDown Keyboard.enter",
@@ -4885,7 +4880,7 @@ Elm.Main.make = function (_elm) {
                    code3)]));
    });
    var taskDemo1 = A8(line3$,
-   "concurrence",
+   "concurrent",
    A2($Basics._op["++"],
    "sendLine1 = Signal.mailbox 0\n",
    A2($Basics._op["++"],
@@ -5000,8 +4995,6 @@ Elm.Main.make = function (_elm) {
                       ,TimeSignal: TimeSignal
                       ,Act: Act
                       ,timefps: timefps
-                      ,titleFontColor: titleFontColor
-                      ,typeFontColor: typeFontColor
                       ,codeBackColor: codeBackColor
                       ,signalFlow: signalFlow
                       ,lineString: lineString

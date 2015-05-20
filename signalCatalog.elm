@@ -22,14 +22,6 @@ type Flow a = TimeSignal | Act a
 timefps = fps 15
 
 
------color
-titleFontColor = Color.rgb 0 0 0
---titleBackColor
-
-typeFontColor = Color.rgb 255 85 85
---typeBackColor
-
---codeFontColor 
 codeBackColor = Color.rgb 255 255 255
 
 
@@ -52,7 +44,10 @@ timeLineUpdate lineString f signal =
       in foldp update lineString action
 
 
------view 
+
+
+
+-----View 
 
 
 
@@ -94,7 +89,7 @@ toTimeLine f signal = Signal.map (timeLineView ) (timeLineUpdate lineString f si
 
 
 code codeStr = let format string =
-                            Element.color (codeBackColor) 
+                            Element.color (Color.rgb 255 255 255) 
                                 <| Element.justified 
                                 <| Text.monospace 
                                 <| Text.fromString string 
@@ -117,7 +112,7 @@ title str = toSignalElement 7 20 8 titleStyle str
 typeReferenceStyle = 
               { typeface = ["monospace"]
               , height = Just 15
-              , color = typeFontColor
+              , color = Color.rgb 255 85 85
               , bold = True
               , italic = False
               , line = Nothing
@@ -186,7 +181,15 @@ line3' description refeStr code1 code2 code3 signal1 signal2 signal3 =
                         ,basicCatalog signal2 code2
                         ,basicCatalog signal3 code3 ]
 
+
+
+
+
 -----Demo--------------
+
+
+
+
 ----signal
 
 mouseClick = Mouse.clicks
@@ -225,7 +228,7 @@ foldpDemo = line2
 
 mergeTest = Signal.merge Mouse.isDown Keyboard.enter
 mergeDemo = line3
-              "foldp : (a -> state -> state) -> state -> Signal a -> Signal state"
+              "merge : Signal a -> Signal a -> Signal a"
               "Mouse.isDown"
               "Keyboard.enter"
               "Signal.merge Mouse.isDown Keyboard.enter"
@@ -235,7 +238,7 @@ mergeDemo = line3
 
 multiplesOf3 = Signal.filter (\x -> if x % 3 == 0 then True else False ) 6 clickCount
 filterDemo = line2
-                 "foldp : (a -> state -> state) -> state -> Signal a -> Signal state"
+                 "filter : (a -> Bool) -> a -> Signal a -> Signal a"
                  "clickCount = Signal.foldp (\\x y -> y + 1 ) 0 Mouse.clicks"
                  "multiplesOf3 = Signal.filter (\\x -> if x % 3 == 0 then True else False ) 6 clickCount"
                  clickCount
@@ -243,7 +246,7 @@ filterDemo = line2
 
 droTest = Signal.dropRepeats sinceTest
 dropRepeatsDemo = line2
-                      "foldp : (a -> state -> state) -> state -> Signal a -> Signal state"
+                      "dropRepeats : Signal a -> Signal a"
                       "Time.since (1 * second) Mouse.clicks"
                       "Signal.dropRepeats sinceTest"
                       sinceTest
@@ -514,7 +517,7 @@ port sendCount2 = Signal.map (\x -> case x of
                                   Nothing -> Task.fail "") (Stream.fromSignal (clickCount))
 
 taskDemo1 = line3'
-                "concurrence"
+                "concurrent"
                 ( "sendLine1 = Signal.mailbox 0\n" ++ "sendLine2 = Signal.mailbox 0\n" ++ 
                   "port sendCount1 : Signal (Task String ())\n" ++ 
                   "port sendCount1 = Signal.map (\\x -> case x of \n" ++
