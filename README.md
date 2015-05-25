@@ -1,9 +1,9 @@
-##Signalのカタログ
+##Signal の　カタログ
 
 http://giisyu.github.io/elm-signalCatalog/
 
 Signalの性質がひと目で分かる、かもしれないSignalのデモ。
-Signalによっては画面をクリックしてみたり、キーボードを押したりする必要があります。
+Signalによっては画面をクリックしてみたり、十字キーを押したりする必要があります。
 
 ##表示の見方
 
