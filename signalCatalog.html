@@ -4363,7 +4363,7 @@ Elm.Main.make = function (_elm) {
             case "Nothing":
             return $Task.fail("");}
          _U.badCase($moduleName,
-         "between lines 511 and 513");
+         "between lines 527 and 529");
       }();
    },
    $Signal$Stream.fromSignal(clickCount)));
@@ -4383,7 +4383,7 @@ Elm.Main.make = function (_elm) {
             case "Nothing":
             return $Task.fail("");}
          _U.badCase($moduleName,
-         "between lines 515 and 517");
+         "between lines 531 and 533");
       }();
    },
    $Signal$Stream.fromSignal(clickCount)));
@@ -4465,10 +4465,10 @@ Elm.Main.make = function (_elm) {
    var lineSpace = A2(signalSpace,
    5,
    24);
-   var strToElement = F2(function (para,
+   var strToElement = F2(function (stringStyle,
    str) {
       return $Graphics$Element.justified(A2($Text.style,
-      para,
+      stringStyle,
       $Text.fromString(str)));
    });
    var box = F4(function (upSpace,
@@ -4544,8 +4544,9 @@ Elm.Main.make = function (_elm) {
    255,
    255);
    var timefps = $Time.fps(15);
-   var Act = function (a) {
-      return {ctor: "Act",_0: a};
+   var Action = function (a) {
+      return {ctor: "Action"
+             ,_0: a};
    };
    var TimeSignal = {ctor: "TimeSignal"};
    var timeLineUpdate = F3(function (lineString,
@@ -4556,7 +4557,7 @@ Elm.Main.make = function (_elm) {
          state) {
             return function () {
                switch (signal.ctor)
-               {case "Act":
+               {case "Action":
                   return function () {
                        var str = f($Basics.toString(signal._0));
                        return $String.dropLeft($String.length(str))(A2($String.append,
@@ -4568,13 +4569,13 @@ Elm.Main.make = function (_elm) {
                     state,
                     "-"));}
                _U.badCase($moduleName,
-               "between lines 39 and 44");
+               "between lines 42 and 47");
             }();
          });
          var addTimeSignal = function (signal) {
             return A2($Signal.merge,
             A2($Signal._op["<~"],
-            Act,
+            Action,
             signal),
             A2($Signal._op["<~"],
             $Basics.always(TimeSignal),
@@ -4993,7 +4994,7 @@ Elm.Main.make = function (_elm) {
    var main = all;
    _elm.Main.values = {_op: _op
                       ,TimeSignal: TimeSignal
-                      ,Act: Act
+                      ,Action: Action
                       ,timefps: timefps
                       ,codeBackColor: codeBackColor
                       ,signalFlow: signalFlow

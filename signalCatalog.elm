@@ -16,7 +16,7 @@ import Keyboard
 import Color
 
 
-type Flow a = TimeSignal | Act a
+type TimeData a = TimeSignal | Action a
 
 --timing
 timefps = fps 15
@@ -25,21 +25,24 @@ timefps = fps 15
 codeBackColor = Color.rgb 255 255 255
 
 
------
+
 signalFlow : Element.Direction -> List (Signal Element) -> Signal Element
 signalFlow direction list = Extra.mapMany (flow direction) list 
 
 lineString = "------------------------------------------------------"
 
-timeLineUpdate: String ->  (String -> String) -> (Signal a) -> Signal String
+--update
+
+timeLineUpdate: String ->  (String -> String) -> Signal a -> Signal String
 timeLineUpdate lineString f signal =
       let 
-          addTimeSignal signal = merge (Act <~ signal) ( always TimeSignal<~ timefps)
+          addTimeSignal signal = merge (Action <~ signal) ( always TimeSignal<~ timefps)
           action = (addTimeSignal signal)
-          update signal state = case signal of 
-                                    TimeSignal ->String.append state "-" |> dropLeft 1
-                                    Act a      -> let str = f <| toString a
-                                                  in String.append state str 
+          update signal state = 
+                        case signal of 
+                          TimeSignal -> String.append state "-" |> dropLeft 1
+                          Action a   -> let str = f <| toString a
+                                        in String.append state str 
                                                     |> dropLeft (String.length str ) 
       in foldp update lineString action
 
@@ -50,18 +53,23 @@ timeLineUpdate lineString f signal =
 -----View 
 
 
-
-box upSpace leftSpace downSpace strEle =  Element.flow down [
+box : Int -> Int -> Int -> Element -> Element
+box upSpace leftSpace downSpace strEle = 
+         Element.flow down [
                           Element.spacer 0 upSpace 
                           , (Element.flow right [ Element.spacer leftSpace 5 , strEle])
                           , Element.spacer 0 downSpace ]
 
 
-strToElement para str = Element.justified <| Text.style para (Text.fromString str)
+strToElement : Style -> String -> Element
+strToElement stringStyle str =
+             Element.justified <| Text.style stringStyle (Text.fromString str)
+
 
 toSignalElement : Int -> Int -> Int -> Style -> String -> Signal Element 
 toSignalElement upSpace leftSpace downSpace strStyle str = 
      Signal.constant (box upSpace leftSpace downSpace (strToElement strStyle str))
+
 
 signalSpace : Int -> Int -> Signal Element
 signalSpace x y = Signal.constant (Element.spacer x y )
@@ -85,18 +93,19 @@ timeLineView lineStr =
     in  (format lineStr)
 
 toTimeLine : (String -> String)  -> Signal a -> Signal Element
-toTimeLine f signal = Signal.map (timeLineView ) (timeLineUpdate lineString f signal)
+toTimeLine f signal = Signal.map timeLineView (timeLineUpdate lineString f signal)
 
 
-code codeStr = let format string =
-                            Element.color (Color.rgb 255 255 255) 
+code : String -> Signal Element
+code codeStr = 
+      let format string =    Element.color (Color.rgb 255 255 255) 
                                 <| Element.justified 
                                 <| Text.monospace 
                                 <| Text.fromString string 
-                    in Signal.constant ( Element.spacer 5 5 `beside` format codeStr)
+      in Signal.constant ( Element.spacer 5 5 `beside` format codeStr)
 
 
-
+titleStyle : Style
 titleStyle = 
               { typeface = ["monospace"]
               , height = Just 25
@@ -109,6 +118,7 @@ titleStyle =
 title : String -> Signal Element
 title str = toSignalElement 7 20 8 titleStyle str
 
+typeReferenceStyle : Style
 typeReferenceStyle = 
               { typeface = ["monospace"]
               , height = Just 15
@@ -123,6 +133,7 @@ typeReferenceStyle =
 typeReference : String -> Signal Element
 typeReference str = toSignalElement 3 70 3 typeReferenceStyle str 
 
+reference'Sryle : Style
 reference'Sryle = 
                 { typeface = ["monospace"]
               , height = Just 15
@@ -132,32 +143,36 @@ reference'Sryle =
               , line = Nothing
               }
 
+reference' : String -> Signal Element
 reference' str = toSignalElement 3 70 5 reference'Sryle str
 
 customCatalog : Signal a -> (String -> String) -> String -> Signal Element
-customCatalog signal f codeStr = signalFlow right [toTypeElement signal 
-                                               ,signalSpace 5 10
-                                               ,toTimeLine f signal
-                                               ,code codeStr]
+customCatalog signal f codeStr = 
+            signalFlow right [toTypeElement signal 
+                             ,signalSpace 5 10
+                             ,toTimeLine f signal
+                             ,code codeStr]
 
 basicCatalog : Signal a -> String -> Signal Element
 basicCatalog signal str = customCatalog signal identity str
 
 
-line1 description code signal = signalFlow down [
-                    typeReference description
-                    ,basicCatalog signal code
-                    ]
+line1 : String -> String -> Signal a -> Signal Element
+line1 description code signal = 
+            signalFlow down [
+                              typeReference description
+                              ,basicCatalog signal code
+                              ]
 
 
-
+line2 : String -> String -> Signal a -> Signal Element
 line2 description code1 code2 signal1 signal2 = 
         signalFlow down [
                     typeReference description
                     ,basicCatalog signal1 code1
                     ,basicCatalog signal2 code2
                               ]
-
+line1 : String -> String -> Signal a -> Signal Element
 line2' description refeStr code1 code2 signal1 signal2 = 
         signalFlow down [
                     typeReference description
@@ -165,14 +180,14 @@ line2' description refeStr code1 code2 signal1 signal2 =
                     ,basicCatalog signal1 code1
                     ,basicCatalog signal2 code2
                               ]
-
+line1 : String -> String -> Signal a -> Signal Element
 line3 description code1 code2 code3 signal1 signal2 signal3 = 
             signalFlow down [
                         typeReference description
                         ,basicCatalog signal1 code1
                         ,basicCatalog signal2 code2
                         ,basicCatalog signal3 code3 ]
-
+line1 : String -> String -> Signal a -> Signal Element
 line3' description refeStr code1 code2 code3 signal1 signal2 signal3 = 
             signalFlow down [
                         typeReference description
@@ -190,12 +205,11 @@ line3' description refeStr code1 code2 code3 signal1 signal2 signal3 =
 
 
 
-----signal
-
 mouseClick = Mouse.clicks
 trueClick = Signal.map (always True) Mouse.clicks
 
-mapDemo = signalFlow down [
+mapDemo = 
+  signalFlow down [
                 typeReference "map : (a -> result) -> Signal a -> Signal result"
                 ,reference' "Apply a function to a signal."
                 ,basicCatalog mouseClick "Mouse.clicks"
@@ -208,7 +222,8 @@ mapDemo = signalFlow down [
 countTime = Signal.foldp (\x y -> y + 1 ) 0 (every second)
 map2Test = Signal.map2 (,) mouseClick countTime
 
-map2Demo = line3 
+map2Demo = 
+        line3 
               "map2 : (a -> b -> result) -> Signal a -> Signal b -> Signal result"
               "Mouse.clicks"
               "countTime = Signal.foldp (\\x y -> y + 1 ) 0 (every second)"
@@ -218,12 +233,13 @@ map2Demo = line3
               map2Test
 
 clickCount = Signal.foldp (\x y -> y + 1 ) 0 mouseClick
-foldpDemo = line2
-                     "foldp : (a -> state -> state) -> state -> Signal a -> Signal state"
-                     "Mouse.clicks"
-                     "clickCount = Signal.foldp (\\x y -> y + 1 ) 0 mouseClick"
-                      mouseClick
-                      clickCount
+foldpDemo =
+         line2
+           "foldp : (a -> state -> state) -> state -> Signal a -> Signal state"
+           "Mouse.clicks"
+           "clickCount = Signal.foldp (\\x y -> y + 1 ) 0 mouseClick"
+            mouseClick
+            clickCount
 
 
 mergeTest = Signal.merge Mouse.isDown Keyboard.enter
@@ -442,15 +458,10 @@ keepWhenIDemo = line3
                     mouseIsDown
                     fpsTest
                     keepWhenITest
----stream
---streamMapDemo
---toSignalDemo
---fromSignalDemo
 
 
 
-
-----time
+----Signal.Time
 throttledMouseClicks = ExTime.limitRate (2 * second) Mouse.clicks
 limitRateDemo = line2 
                   "limitRate : Time -> Signal a -> Signal a"
@@ -477,7 +488,8 @@ tooltip =
             (always True <~ (Mouse.position
                             |> ExTime.settledAfter (500 * Time.millisecond)))
 
-settledAfterDemo = line3
+settledAfterDemo =
+                 line3
                         "settledAfter : Time -> Signal a -> Signal a"
                         "Mouse.position"
                         "ExTime.settledAfter (500 * Time.millisecond) mousePosition"
@@ -536,11 +548,18 @@ taskDemo1 = line3'
 
 --demoList
 
+lineSpace : Signal Element
 lineSpace = signalSpace 5 24 
 
+demoList : List (Signal Element) -> Signal Element
 demoList list = signalFlow down <| ( List.intersperse lineSpace list ) ++ [lineSpace]
 
-all = signalFlow down [ 
+
+--all
+
+all : Signal Element
+all = 
+  signalFlow down [ 
                         title "Signal"
                         , demoList [ mapDemo
                                   , map2Demo
