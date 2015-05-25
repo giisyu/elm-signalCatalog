@@ -115,8 +115,8 @@ titleStyle =
 title : String -> Signal Element
 title str = toSignalElement 7 20 8 titleStyle str
 
-typeReferenceStyle : Style
-typeReferenceStyle = 
+fucnNameStyle : Style
+fucnNameStyle = 
               { typeface = ["monospace"]
               , height = Just 15
               , color = Color.rgb 255 85 85
@@ -127,11 +127,11 @@ typeReferenceStyle =
 
 
 
-typeReference : String -> Signal Element
-typeReference str = toSignalElement 3 70 3 typeReferenceStyle str 
+functionName : String -> Signal Element
+functionName str = toSignalElement 3 70 3 fucnNameStyle str 
 
-reference'Sryle : Style
-reference'Sryle = 
+descriptionSryle : Style
+descriptionSryle = 
                 { typeface = ["monospace"]
               , height = Just 15
               , color = Color.black
@@ -140,8 +140,8 @@ reference'Sryle =
               , line = Nothing
               }
 
-reference' : String -> Signal Element
-reference' str = toSignalElement 3 70 5 reference'Sryle str
+description : String -> Signal Element
+description str = toSignalElement 3 70 5 descriptionSryle str
 
 customCatalog : Signal a -> (String -> String) -> String -> Signal Element
 customCatalog signal f codeStr = 
@@ -155,34 +155,34 @@ basicCatalog signal str = customCatalog signal identity str
 
 
 line1 : String -> String -> Signal a -> Signal Element
-line1 description code signal = 
+line1 funcName code signal = 
             signalFlow down [
-                              typeReference description
+                              functionName funcName
                               ,basicCatalog signal code
                               ]
 
 
 line2 : String ->String -> String -> Signal a -> Signal b -> Signal Element
-line2 description code1 code2 signal1 signal2 = 
+line2 funcName code1 code2 signal1 signal2 = 
         signalFlow down [
-                    typeReference description
+                    functionName funcName
                     ,basicCatalog signal1 code1
                     ,basicCatalog signal2 code2
                               ]
 
 line3 : String -> String -> String -> String -> Signal a -> Signal b ->Signal c ->Signal Element
-line3 description code1 code2 code3 signal1 signal2 signal3 = 
+line3 funcName code1 code2 code3 signal1 signal2 signal3 = 
             signalFlow down [
-                        typeReference description
+                        functionName funcName
                         ,basicCatalog signal1 code1
                         ,basicCatalog signal2 code2
                         ,basicCatalog signal3 code3 ]
-          
+
 line3' : String -> String -> String -> String ->String -> Signal a ->Signal b ->Signal c -> Signal Element
-line3' description refeStr code1 code2 code3 signal1 signal2 signal3 = 
+line3' funcName refeStr code1 code2 code3 signal1 signal2 signal3 = 
             signalFlow down [
-                        typeReference description
-                        ,reference' refeStr
+                        functionName funcName
+                        ,description refeStr
                         ,basicCatalog signal1 code1
                         ,basicCatalog signal2 code2
                         ,basicCatalog signal3 code3 ]
@@ -204,8 +204,8 @@ trueClick = Signal.map (always True) Mouse.clicks
 mapDemo : Signal Element
 mapDemo = 
   signalFlow down [
-                typeReference "map : (a -> result) -> Signal a -> Signal result"
-                ,reference' "Apply a function to a signal."
+                functionName "map : (a -> result) -> Signal a -> Signal result"
+                ,description "Apply a function to a signal."
                 ,basicCatalog mouseClick "Mouse.clicks"
                 ,customCatalog trueClick 
                            (\x -> if | x == "True" -> " T"
@@ -323,14 +323,14 @@ sinceDemo =  line2
 --discrete
 esTest = Discrete.es (every second)
 esDemo =  signalFlow down [
-                    typeReference "es : Signal a -> EventSource"
+                    functionName "es : Signal a -> EventSource"
                     ,customCatalog (every second) (\x -> String.left 3 x ) "every second"
                     ,basicCatalog esTest "Discrete.es (every second)"
                      ]
 
 equalTest = Discrete.whenEqual True Mouse.isDown
 whenEqualDemo = signalFlow down [
-  typeReference "whenEqual : a -> Signal a -> EventSource"
+  functionName "whenEqual : a -> Signal a -> EventSource"
   ,customCatalog mouseIsDown (\x -> if x == "True" then "T" else "F") "Mouse.isDown"
   ,basicCatalog equalTest "Discrete.whenEqual True Mouse.isDown"]
 
@@ -573,7 +573,7 @@ all =
                                 , sinceDemo]
                         ,title "elm-signal-extra"
                         ,title "Signal.Discrete"
-                        ,typeReference "type alias EventSource = Signal ()"
+                        ,functionName "type alias EventSource = Signal ()"
                         ,demoList [esDemo
                                   ,whenEqualDemo
                                   ,whenChangeDemo
