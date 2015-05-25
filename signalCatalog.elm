@@ -165,29 +165,31 @@ line1 description code signal =
                               ]
 
 
-line2 : String -> String -> Signal a -> Signal Element
+line2 : String ->String -> String -> Signal a -> Signal b -> Signal Element
 line2 description code1 code2 signal1 signal2 = 
         signalFlow down [
                     typeReference description
                     ,basicCatalog signal1 code1
                     ,basicCatalog signal2 code2
                               ]
-line1 : String -> String -> Signal a -> Signal Element
-line2' description refeStr code1 code2 signal1 signal2 = 
-        signalFlow down [
-                    typeReference description
-                    ,reference' refeStr
-                    ,basicCatalog signal1 code1
-                    ,basicCatalog signal2 code2
-                              ]
-line1 : String -> String -> Signal a -> Signal Element
+
+--line2' : String ->String -> String -> Signal a -> Signal Element
+--line2' description refeStr code1 code2 signal1 signal2 = 
+--        signalFlow down [
+--                    typeReference description
+--                    ,reference' refeStr
+--                    ,basicCatalog signal1 code1
+--                    ,basicCatalog signal2 code2
+--                              ]
+
+line3 : String -> String -> String -> String -> Signal a -> Signal b ->Signal c ->Signal Element
 line3 description code1 code2 code3 signal1 signal2 signal3 = 
             signalFlow down [
                         typeReference description
                         ,basicCatalog signal1 code1
                         ,basicCatalog signal2 code2
                         ,basicCatalog signal3 code3 ]
-line1 : String -> String -> Signal a -> Signal Element
+line3' : String -> String -> String -> String ->String -> Signal a ->Signal b ->Signal c -> Signal Element
 line3' description refeStr code1 code2 code3 signal1 signal2 signal3 = 
             signalFlow down [
                         typeReference description
@@ -204,10 +206,13 @@ line3' description refeStr code1 code2 code3 signal1 signal2 signal3 =
 
 
 
-
+mouseClick : Signal ()
 mouseClick = Mouse.clicks
+
+trueClick : Signal Bool
 trueClick = Signal.map (always True) Mouse.clicks
 
+mapDemo : Signal Element
 mapDemo = 
   signalFlow down [
                 typeReference "map : (a -> result) -> Signal a -> Signal result"
@@ -222,6 +227,7 @@ mapDemo =
 countTime = Signal.foldp (\x y -> y + 1 ) 0 (every second)
 map2Test = Signal.map2 (,) mouseClick countTime
 
+map2Demo : Signal Element
 map2Demo = 
         line3 
               "map2 : (a -> b -> result) -> Signal a -> Signal b -> Signal result"

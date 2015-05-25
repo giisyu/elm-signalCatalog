@@ -4363,7 +4363,7 @@ Elm.Main.make = function (_elm) {
             case "Nothing":
             return $Task.fail("");}
          _U.badCase($moduleName,
-         "between lines 527 and 529");
+         "between lines 529 and 531");
       }();
    },
    $Signal$Stream.fromSignal(clickCount)));
@@ -4383,7 +4383,7 @@ Elm.Main.make = function (_elm) {
             case "Nothing":
             return $Task.fail("");}
          _U.badCase($moduleName,
-         "between lines 531 and 533");
+         "between lines 533 and 535");
       }();
    },
    $Signal$Stream.fromSignal(clickCount)));
@@ -4747,21 +4747,6 @@ Elm.Main.make = function (_elm) {
    "relativeTime (Time.every second) ~> Time.inSeconds >> round",
    relativeTest,
    tickcount);
-   var line2$ = F6(function (description,
-   refeStr,
-   code1,
-   code2,
-   signal1,
-   signal2) {
-      return A2(signalFlow,
-      $Graphics$Element.down,
-      _L.fromArray([typeReference(description)
-                   ,reference$(refeStr)
-                   ,A2(basicCatalog,signal1,code1)
-                   ,A2(basicCatalog,
-                   signal2,
-                   code2)]));
-   });
    var line3 = F7(function (description,
    code1,
    code2,
@@ -5019,7 +5004,6 @@ Elm.Main.make = function (_elm) {
                       ,basicCatalog: basicCatalog
                       ,line1: line1
                       ,line2: line2
-                      ,line2$: line2$
                       ,line3: line3
                       ,line3$: line3$
                       ,mouseClick: mouseClick
