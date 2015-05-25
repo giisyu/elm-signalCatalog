@@ -22,16 +22,13 @@ type TimeData a = TimeSignal | Action a
 timefps = fps 15
 
 
-codeBackColor = Color.rgb 255 255 255
-
-
 
 signalFlow : Element.Direction -> List (Signal Element) -> Signal Element
 signalFlow direction list = Extra.mapMany (flow direction) list 
 
 lineString = "------------------------------------------------------"
 
---update
+
 
 timeLineUpdate: String ->  (String -> String) -> Signal a -> Signal String
 timeLineUpdate lineString f signal =
@@ -173,15 +170,6 @@ line2 description code1 code2 signal1 signal2 =
                     ,basicCatalog signal2 code2
                               ]
 
---line2' : String ->String -> String -> Signal a -> Signal Element
---line2' description refeStr code1 code2 signal1 signal2 = 
---        signalFlow down [
---                    typeReference description
---                    ,reference' refeStr
---                    ,basicCatalog signal1 code1
---                    ,basicCatalog signal2 code2
---                              ]
-
 line3 : String -> String -> String -> String -> Signal a -> Signal b ->Signal c ->Signal Element
 line3 description code1 code2 code3 signal1 signal2 signal3 = 
             signalFlow down [
@@ -189,6 +177,7 @@ line3 description code1 code2 code3 signal1 signal2 signal3 =
                         ,basicCatalog signal1 code1
                         ,basicCatalog signal2 code2
                         ,basicCatalog signal3 code3 ]
+          
 line3' : String -> String -> String -> String ->String -> Signal a ->Signal b ->Signal c -> Signal Element
 line3' description refeStr code1 code2 code3 signal1 signal2 signal3 = 
             signalFlow down [
