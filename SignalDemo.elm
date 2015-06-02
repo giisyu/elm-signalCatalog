@@ -1,7 +1,6 @@
 module SignalDemo (signalDemo,mouseClick,fpsTest,countTime,clickCount,mouseIsDown) where
 
 import View exposing (..)
-
 import Mouse exposing (clicks,isDown)
 import Signal exposing (..)
 import Time exposing (..)
