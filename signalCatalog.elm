@@ -1,3 +1,4 @@
+module SignalCatalog where
 
 import Signal.Stream as Stream
 import Signal exposing (..)

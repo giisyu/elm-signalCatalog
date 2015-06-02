@@ -1,0 +1,1 @@
+var app = Elm.fullscreen(Elm.SignalCatalog,{});
