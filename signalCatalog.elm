@@ -1,6 +1,5 @@
 import Html exposing (text,div)
 import Html.Attributes exposing (style)
-import Mouse exposing (clicks,isDown)
 import Signal exposing (..)
 import Task exposing (..)
 import List
@@ -13,8 +12,10 @@ import Keyboard
 import View exposing (..)
 import Graphics.Element exposing (down,Element)
 import String
+import Mouse exposing (clicks,isDown)
 
 
+import SignalDemo exposing(..)
 
 
 fpsDemo = line1
@@ -22,7 +23,6 @@ fpsDemo = line1
             "fps 1"
             fpsTest
 
-mouseIsDown = Mouse.isDown
 fpsWhenTest = Time.fpsWhen 5 mouseIsDown
 fpsWhenDemo = line2
                          "fpsWhen : number -> Signal Bool -> Signal Time"

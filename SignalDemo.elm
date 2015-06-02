@@ -1,9 +1,12 @@
-module SignalDemo (signalDemo) where
+module SignalDemo (signalDemo,mouseClick,fpsTest,countTime,clickCount,mouseIsDown) where
 
 import View exposing (..)
 
-
-
+import Mouse exposing (clicks,isDown)
+import Signal exposing (..)
+import Time exposing (..)
+import Graphics.Element as Element exposing (down,Element)
+import Keyboard
 
 
 mouseClick : Signal ()
@@ -48,6 +51,7 @@ foldpDemo =
             clickCount
 
 
+mouseIsDown = Mouse.isDown
 mergeTest = Signal.merge Mouse.isDown Keyboard.enter
 mergeDemo = line3
               "merge : Signal a -> Signal a -> Signal a"
@@ -66,6 +70,7 @@ filterDemo = line2
                  clickCount
                  multiplesOf3
 
+sinceTest = Time.since (1 * second) mouseClick
 droTest = Signal.dropRepeats sinceTest
 dropRepeatsDemo = line2
                       "dropRepeats : Signal a -> Signal a"

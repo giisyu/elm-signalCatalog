@@ -1,4 +1,4 @@
-module View (signalFlow,functionName,description,basicCatalog,customCatalog,signalSpace,title, line1,line2,line3,line3') where
+module View (signalFlow,functionName,description,basicCatalog,customCatalog,signalSpace,title, line1,line2,line3,line3',demoList) where
 
 import Graphics.Element as Element exposing (Element,show ,flow , down,right,justified,beside)
 import Time exposing (..)
