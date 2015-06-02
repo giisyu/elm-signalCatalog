@@ -180,3 +180,12 @@ line3' funcName refeStr code1 code2 code3 signal1 signal2 signal3 =
                         ,basicCatalog signal1 code1
                         ,basicCatalog signal2 code2
                         ,basicCatalog signal3 code3 ]
+
+
+--demoList
+
+lineSpace : Signal Element
+lineSpace = signalSpace 5 24
+
+demoList : List (Signal Element) -> Signal Element
+demoList list = signalFlow down <| ( List.intersperse lineSpace list ) ++ [lineSpace]
