@@ -3,190 +3,16 @@ import Html.Attributes exposing (style)
 import Mouse exposing (clicks,isDown)
 import Signal exposing (..)
 import Task exposing (..)
-import Graphics.Element as Element exposing (Element,show ,flow , down,right,justified,beside)
-import List 
-import Text exposing (Style )
+import List
 import Time exposing (..)
-import String exposing (append,dropLeft)
 import Signal.Extra as Extra exposing ((~>))
 import Signal.Discrete as Discrete
 import Signal.Stream as Stream
 import Signal.Time as ExTime
 import Keyboard
-import Color
-
-
-type TimeData a = TimeSignal | Action a
-
---timing
-timefps = fps 15
-
-
-
-signalFlow : Element.Direction -> List (Signal Element) -> Signal Element
-signalFlow direction list = Extra.mapMany (flow direction) list 
-
-lineString = "------------------------------------------------------"
-
-
-
-timeLineUpdate: String ->  (String -> String) -> Signal a -> Signal String
-timeLineUpdate lineString f signal =
-      let 
-          addTimeSignal signal = merge (Action <~ signal) ( always TimeSignal<~ timefps)
-          action = (addTimeSignal signal)
-          update signal state = 
-                        case signal of 
-                          TimeSignal -> String.append state "-" |> dropLeft 1
-                          Action a   -> let str = f <| toString a
-                                        in String.append state str 
-                                                    |> dropLeft (String.length str ) 
-      in foldp update lineString action
-
-
-
-
-
------View 
-
-
-box : Int -> Int -> Int -> Element -> Element
-box upSpace leftSpace downSpace strEle = 
-         Element.flow down [
-                          Element.spacer 0 upSpace 
-                          , (Element.flow right [ Element.spacer leftSpace 5 , strEle])
-                          , Element.spacer 0 downSpace ]
-
-
-strToElement : Style -> String -> Element
-strToElement stringStyle str =
-             Element.justified <| Text.style stringStyle (Text.fromString str)
-
-
-toSignalElement : Int -> Int -> Int -> Style -> String -> Signal Element 
-toSignalElement upSpace leftSpace downSpace strStyle str = 
-     Signal.constant (box upSpace leftSpace downSpace (strToElement strStyle str))
-
-
-signalSpace : Int -> Int -> Signal Element
-signalSpace x y = Signal.constant (Element.spacer x y )
-
-
-typeEleFormat : String -> Element
-typeEleFormat str = Element.justified 
-                        <| Text.monospace 
-                        <| Text.fromString  
-                        <| String.padLeft 35 ' ' str
-                        
-toTypeElement : Signal a -> Signal Element
-toTypeElement signal = 
-   Signal.map (\x -> typeEleFormat <| toString x) signal
-  
-timeLineView :  String -> Element
-timeLineView lineStr = 
-    let format string = Element.justified 
-                                <| Text.monospace 
-                                <| Text.fromString string
-    in  (format lineStr)
-
-toTimeLine : (String -> String)  -> Signal a -> Signal Element
-toTimeLine f signal = Signal.map timeLineView (timeLineUpdate lineString f signal)
-
-
-code : String -> Signal Element
-code codeStr = 
-      let format string =    Element.color (Color.rgb 255 255 255) 
-                                <| Element.justified 
-                                <| Text.monospace 
-                                <| Text.fromString string 
-      in Signal.constant ( Element.spacer 5 5 `beside` format codeStr)
-
-
-titleStyle : Style
-titleStyle = 
-              { typeface = ["monospace"]
-              , height = Just 25
-              , color = Color.black
-              , bold = True
-              , italic = False
-              , line = Nothing
-              }
-
-title : String -> Signal Element
-title str = toSignalElement 7 20 8 titleStyle str
-
-fucnNameStyle : Style
-fucnNameStyle = 
-              { typeface = ["monospace"]
-              , height = Just 15
-              , color = Color.rgb 255 85 85
-              , bold = True
-              , italic = False
-              , line = Nothing
-              }
-
-
-
-functionName : String -> Signal Element
-functionName str = toSignalElement 3 70 3 fucnNameStyle str 
-
-descriptionSryle : Style
-descriptionSryle = 
-                { typeface = ["monospace"]
-              , height = Just 15
-              , color = Color.black
-              , bold = False 
-              , italic = False
-              , line = Nothing
-              }
-
-description : String -> Signal Element
-description str = toSignalElement 3 70 5 descriptionSryle str
-
-customCatalog : Signal a -> (String -> String) -> String -> Signal Element
-customCatalog signal f codeStr = 
-            signalFlow right [toTypeElement signal 
-                             ,signalSpace 5 10
-                             ,toTimeLine f signal
-                             ,code codeStr]
-
-basicCatalog : Signal a -> String -> Signal Element
-basicCatalog signal str = customCatalog signal identity str
-
-
-line1 : String -> String -> Signal a -> Signal Element
-line1 funcName code signal = 
-            signalFlow down [
-                              functionName funcName
-                              ,basicCatalog signal code
-                              ]
-
-
-line2 : String ->String -> String -> Signal a -> Signal b -> Signal Element
-line2 funcName code1 code2 signal1 signal2 = 
-        signalFlow down [
-                    functionName funcName
-                    ,basicCatalog signal1 code1
-                    ,basicCatalog signal2 code2
-                              ]
-
-line3 : String -> String -> String -> String -> Signal a -> Signal b ->Signal c ->Signal Element
-line3 funcName code1 code2 code3 signal1 signal2 signal3 = 
-            signalFlow down [
-                        functionName funcName
-                        ,basicCatalog signal1 code1
-                        ,basicCatalog signal2 code2
-                        ,basicCatalog signal3 code3 ]
-
-line3' : String -> String -> String -> String ->String -> Signal a ->Signal b ->Signal c -> Signal Element
-line3' funcName refeStr code1 code2 code3 signal1 signal2 signal3 = 
-            signalFlow down [
-                        functionName funcName
-                        ,description refeStr
-                        ,basicCatalog signal1 code1
-                        ,basicCatalog signal2 code2
-                        ,basicCatalog signal3 code3 ]
-
+import View exposing (..)
+import Graphics.Element exposing (down,Element)
+import String
 
 
 
@@ -202,12 +28,12 @@ trueClick : Signal Bool
 trueClick = Signal.map (always True) Mouse.clicks
 
 mapDemo : Signal Element
-mapDemo = 
+mapDemo =
   signalFlow down [
                 functionName "map : (a -> result) -> Signal a -> Signal result"
                 ,description "Apply a function to a signal."
                 ,basicCatalog mouseClick "Mouse.clicks"
-                ,customCatalog trueClick 
+                ,customCatalog trueClick
                            (\x -> if | x == "True" -> " T"
                                      | otherwise -> x)
                            "trueClick = Signal.map (always True) Mouse.clicks"
@@ -217,8 +43,8 @@ countTime = Signal.foldp (\x y -> y + 1 ) 0 (every second)
 map2Test = Signal.map2 (,) mouseClick countTime
 
 map2Demo : Signal Element
-map2Demo = 
-        line3 
+map2Demo =
+        line3
               "map2 : (a -> b -> result) -> Signal a -> Signal b -> Signal result"
               "Mouse.clicks"
               "countTime = Signal.foldp (\\x y -> y + 1 ) 0 (every second)"
@@ -271,7 +97,7 @@ sampleOnDemo = line3
                  "fps 1"
                  "Signal.sampleOn trueClick (fps 1 )"
                  trueClick
-                 fpsTest 
+                 fpsTest
                  sampleOnSignal
 
 fpsDemo = line1
@@ -336,7 +162,7 @@ whenEqualDemo = signalFlow down [
 
 sinceTest2 = Time.since (500 * millisecond) mouseClick
 whenChangeTest = Discrete.whenChange sinceTest2
-whenChangeDemo = line2 
+whenChangeDemo = line2
                     "whenChange : Signal a -> EventSource"
                     "sinceTest2 = Time.since (500 * millisecond) mouseClick"
                     "Discrete.whenChange sinceTest2"
@@ -345,7 +171,7 @@ whenChangeDemo = line2
 
 
 whenChangeToTest = Discrete.whenChangeTo True Keyboard.enter
-whenChangeToDemo = line2 
+whenChangeToDemo = line2
                       "whenChangeTo: a -> Signal a -> EventSource"
                       "Keyboard.enter"
                       "Discrete.whenChangeTo True Keyboard.enter"
@@ -354,7 +180,7 @@ whenChangeToDemo = line2
 
 enter = Discrete.whenChangeTo True Keyboard.enter
 toggleOnEnter = Discrete.folde not False enter
-foldeDemo = line2 
+foldeDemo = line2
                 "folde : (b -> b) -> b -> EventSource -> Signal b"
                 "enter = Discrete.whenChangeTo True Keyboard.enter"
                 "toggleOnEnter = Discrete.folde not False enter"
@@ -369,7 +195,7 @@ sampleDemo = line1
 
 ---extra
 
-zipTest = Extra.zip Mouse.x Mouse.y 
+zipTest = Extra.zip Mouse.x Mouse.y
 zipDemo =  line1
               "zip : Signal a -> Signal b -> Signal (a,b)"
               "Extra.zip Mouse.x Mouse.y "
@@ -382,7 +208,7 @@ runBufferDemo = line2
                   "runBuffer : Int -> Signal a -> Signal (List a)"
                   "runBuffer 5 (count (Time.every second))"
                   "((==) [1,2,3,4,5]) <~ runBuffer 5 (count (Time.every second))"
-                  run 
+                  run
                   runlist
 
 derayRTest = Extra.delayRound 0 clickCount
@@ -396,7 +222,7 @@ delayRoundDemo = line2
 
 switchWhenTest = Extra.switchWhen mouseIsDown (fps 2) (every second)
 fps2 = fps 2
-switchWhenDemo = line3 
+switchWhenDemo = line3
                     "switchWhen : Signal Bool -> Signal a -> Signal a -> Signal a"
                     "Mouse.isDown"
                     "fps 2"
@@ -406,7 +232,7 @@ switchWhenDemo = line3
                     switchWhenTest
 
 switchSampleTest = Extra.switchSample mouseIsDown (fps 2) (every second)
-switchSampleDemo = line3 
+switchSampleDemo = line3
                     "switchSample : Signal Bool -> Signal a -> Signal a -> Signal a"
                     "fps 2"
                     "every second"
@@ -414,18 +240,18 @@ switchSampleDemo = line3
                     fps2
                     (every second)
                     switchSampleTest
-keepWhenTest = Extra.keepWhen mouseIsDown 0 (fps 1)  
-keepWhenDemo = line3 
+keepWhenTest = Extra.keepWhen mouseIsDown 0 (fps 1)
+keepWhenDemo = line3
                   "keepWhen : Signal Bool -> a -> Signal a -> Signal a"
                   "mouseIsDown"
                   "fps 1"
                   "Extra.keepWhen mouseIsDown 0 (fps 1) "
                   mouseIsDown
-                  (fps 1) 
+                  (fps 1)
                   keepWhenTest
 
-sampleWhenTest = Extra.sampleWhen mouseIsDown 0 (fps 1)  
-sampleWhenDemo = line3 
+sampleWhenTest = Extra.sampleWhen mouseIsDown 0 (fps 1)
+sampleWhenDemo = line3
                   "sampleWhen : Signal Bool -> a -> Signal a -> Signal a"
                   "mouseIsDown"
                   "fps 1"
@@ -434,8 +260,8 @@ sampleWhenDemo = line3
                   fpsTest
                   sampleWhenTest
 
-keepThenTest = Extra.keepThen mouseIsDown 0 (fps 1)  
-keepThenDemo = line3 
+keepThenTest = Extra.keepThen mouseIsDown 0 (fps 1)
+keepThenDemo = line3
                   "keepThen : Signal Bool -> a -> Signal a -> Signal a"
                   "mouseIsDown"
                   "fps 1"
@@ -445,7 +271,7 @@ keepThenDemo = line3
                   keepThenTest
 
 keepWhenITest = Extra.keepWhenI mouseIsDown (fps 1)
-keepWhenIDemo = line3 
+keepWhenIDemo = line3
                     "keepWhenI : Signal Bool -> Signal a -> Signal a"
                     "Mouse.isDown"
                     "fps 1"
@@ -458,7 +284,7 @@ keepWhenIDemo = line3
 
 ----Signal.Time
 throttledMouseClicks = ExTime.limitRate (2 * second) Mouse.clicks
-limitRateDemo = line2 
+limitRateDemo = line2
                   "limitRate : Time -> Signal a -> Signal a"
                   "Mouse.clicks"
                   "throttledMouseClicks = limitRate (2 * second) Mouse.clicks"
@@ -478,8 +304,8 @@ mousePosition = Mouse.position
 
 after = ExTime.settledAfter (500 * Time.millisecond) mousePosition
 
-tooltip = 
-      merge (always False <~ Mouse.position) 
+tooltip =
+      merge (always False <~ Mouse.position)
             (always True <~ (Mouse.position
                             |> ExTime.settledAfter (500 * Time.millisecond)))
 
@@ -495,17 +321,17 @@ settledAfterDemo =
                         after
                         tooltip
 
-start = ExTime.startTime 
-startTimeDemo = line1 
+start = ExTime.startTime
+startTimeDemo = line1
                     "startTime : Signal Time"
                     "startTime"
-                    start 
+                    start
 
 
 relativeTest = ExTime.relativeTime (Time.every second)
 tickcount =  ExTime.relativeTime (Time.every second) ~> Time.inSeconds >> round
 
-relativeTimeDemo = line2 
+relativeTimeDemo = line2
                       "relativeTime : Signal Time -> Signal Time"
                       "relativeTime (Time.every second)"
                       "relativeTime (Time.every second) ~> Time.inSeconds >> round"
@@ -515,20 +341,20 @@ sendLine1 = Signal.mailbox 0
 sendLine2 = Signal.mailbox 0
 
 port sendCount1 : Signal (Task String ())
-port sendCount1 = Signal.map (\x -> case x of 
+port sendCount1 = Signal.map (\x -> case x of
                                   Just a ->Signal.send sendLine1.address a
                                   Nothing -> Task.fail "") (Stream.fromSignal (clickCount))
 port sendCount2 : Signal (Task String ())
-port sendCount2 = Signal.map (\x -> case x of 
+port sendCount2 = Signal.map (\x -> case x of
                                   Just a ->Task.andThen ( Signal.send sendLine2.address a) (\x -> Task.sleep second)
                                   Nothing -> Task.fail "") (Stream.fromSignal (clickCount))
 
 taskDemo1 = line3'
                 "concurrent"
-                ( "sendLine1 = Signal.mailbox 0\n" ++ "sendLine2 = Signal.mailbox 0\n" ++ 
-                  "port sendCount1 : Signal (Task String ())\n" ++ 
+                ( "sendLine1 = Signal.mailbox 0\n" ++ "sendLine2 = Signal.mailbox 0\n" ++
+                  "port sendCount1 : Signal (Task String ())\n" ++
                   "port sendCount1 = Signal.map (\\x -> case x of \n" ++
-                  "                 Just a ->Signal.send sendLine1.address a\n" ++ 
+                  "                 Just a ->Signal.send sendLine1.address a\n" ++
                   "                 Nothing -> Task.fail \"\") (Stream.fromSignal (clickCount))\n"++
   "port sendCount2 : Signal (Task String ())\n"++
   "port sendCount2 = Signal.map (\\x -> case x of \n"++
@@ -544,7 +370,7 @@ taskDemo1 = line3'
 --demoList
 
 lineSpace : Signal Element
-lineSpace = signalSpace 5 24 
+lineSpace = signalSpace 5 24
 
 demoList : List (Signal Element) -> Signal Element
 demoList list = signalFlow down <| ( List.intersperse lineSpace list ) ++ [lineSpace]
@@ -553,8 +379,8 @@ demoList list = signalFlow down <| ( List.intersperse lineSpace list ) ++ [lineS
 --all
 
 all : Signal Element
-all = 
-  signalFlow down [ 
+all =
+  signalFlow down [
                         title "Signal"
                         , demoList [ mapDemo
                                   , map2Demo
@@ -565,11 +391,11 @@ all =
                                   , sampleOnDemo ]
                         ,title "Time"
                         , demoList [
-                                  fpsDemo 
+                                  fpsDemo
                                 ,fpsWhenDemo
                                 , everyDemo
                                 , timestampDemo
-                                , delayDemo 
+                                , delayDemo
                                 , sinceDemo]
                         ,title "elm-signal-extra"
                         ,title "Signal.Discrete"
@@ -584,7 +410,7 @@ all =
                                  zipDemo
                                 ,runBufferDemo
                                 ,delayRoundDemo
-                                ,switchWhenDemo 
+                                ,switchWhenDemo
                                 ,switchSampleDemo
                                 ,keepWhenDemo
                                 ,sampleWhenDemo
