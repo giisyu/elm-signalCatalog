@@ -2591,6 +2591,39 @@ Elm.Graphics.Element.make = function (_elm) {
                                   ,Position: Position};
    return _elm.Graphics.Element.values;
 };
+Elm.History = Elm.History || {};
+Elm.History.make = function (_elm) {
+   "use strict";
+   _elm.History = _elm.History || {};
+   if (_elm.History.values)
+   return _elm.History.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "History",
+   $Native$History = Elm.Native.History.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var path = $Native$History.path;
+   var hash = $Native$History.hash;
+   var length = $Native$History.length;
+   var forward = $Native$History.forward;
+   var back = $Native$History.back;
+   var go = $Native$History.go;
+   var replacePath = $Native$History.replacePath;
+   var setPath = $Native$History.setPath;
+   _elm.History.values = {_op: _op
+                         ,setPath: setPath
+                         ,replacePath: replacePath
+                         ,go: go
+                         ,back: back
+                         ,forward: forward
+                         ,length: length
+                         ,hash: hash
+                         ,path: path};
+   return _elm.History.values;
+};
 Elm.Keyboard = Elm.Keyboard || {};
 Elm.Keyboard.make = function (_elm) {
    "use strict";
@@ -4855,6 +4888,116 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		block: block,
 		markdown: markdown
 	};
+
+};
+
+Elm.Native = Elm.Native || {};
+Elm.Native.History = {};
+Elm.Native.History.make = function(localRuntime){
+
+  localRuntime.Native = localRuntime.Native || {};
+  localRuntime.Native.History = localRuntime.Native.History || {};
+
+  if (localRuntime.Native.History.values){
+    return localRuntime.Native.History.values;
+  }
+
+  var NS = Elm.Native.Signal.make(localRuntime);
+  var Task = Elm.Native.Task.make(localRuntime);
+  var Utils = Elm.Native.Utils.make(localRuntime);
+  var node = window;
+
+  // path : Signal String
+  var path = NS.input('History.path', window.location.pathname);
+
+  // length : Signal Int
+  var length = NS.input('History.length', window.history.length);
+
+  // hash : Signal String
+  var hash = NS.input('History.hash', window.location.hash);
+
+  localRuntime.addListener([path.id, length.id], node, 'popstate', function getPath(event){
+    localRuntime.notify(path.id, window.location.pathname);
+    localRuntime.notify(length.id, window.history.length);
+    localRuntime.notify(hash.id, window.location.hash);
+  });
+
+  localRuntime.addListener([hash.id], node, 'hashchange', function getHash(event){
+    localRuntime.notify(hash.id, window.location.hash);
+  });
+
+  // setPath : String -> Task error ()
+  var setPath = function(urlpath){
+    return Task.asyncFunction(function(callback){
+      setTimeout(function(){
+        localRuntime.notify(path.id, urlpath);
+        window.history.pushState({}, "", urlpath);
+        localRuntime.notify(hash.id, window.location.hash);
+        localRuntime.notify(length.id, window.history.length);
+
+      },0);
+      return callback(Task.succeed(Utils.Tuple0));
+    });
+  };
+
+  // replacePath : String -> Task error ()
+  var replacePath = function(urlpath){
+    return Task.asyncFunction(function(callback){
+      setTimeout(function(){
+        localRuntime.notify(path.id, urlpath);
+        window.history.replaceState({}, "", urlpath);
+        localRuntime.notify(hash.id, window.location.hash);
+        localRuntime.notify(length.id, window.history.length);
+      },0);
+      return callback(Task.succeed(Utils.Tuple0));
+    });
+  };
+
+  // go : Int -> Task error ()
+  var go = function(n){
+    return Task.asyncFunction(function(callback){
+      setTimeout(function(){
+        window.history.go(n);
+        localRuntime.notify(length.id, window.history.length);
+        localRuntime.notify(hash.id, window.location.hash);
+      }, 0);
+      return callback(Task.succeed(Utils.Tuple0));
+    });
+  };
+
+  // back : Task error ()
+  var back = Task.asyncFunction(function(callback){
+    setTimeout(function(){
+      localRuntime.notify(hash.id, window.location.hash);
+      window.history.back();
+      localRuntime.notify(length.id, window.history.length);
+
+    }, 0);
+    return callback(Task.succeed(Utils.Tuple0));
+  });
+
+  // forward : Task error ()
+  var forward = Task.asyncFunction(function(callback){
+    setTimeout(function(){
+      window.history.forward();
+      localRuntime.notify(length.id, window.history.length);
+      localRuntime.notify(hash.id, window.location.hash);
+    }, 0);
+    return callback(Task.succeed(Utils.Tuple0));
+  });
+
+
+
+  return {
+    path        : path,
+    setPath     : setPath,
+    replacePath : replacePath,
+    go          : go,
+    back        : back,
+    forward     : forward,
+    length      : length,
+    hash        : hash
+  };
 
 };
 
@@ -8304,6 +8447,74 @@ Elm.Result.make = function (_elm) {
                         ,Err: Err};
    return _elm.Result.values;
 };
+Elm.Router = Elm.Router || {};
+Elm.Router.make = function (_elm) {
+   "use strict";
+   _elm.Router = _elm.Router || {};
+   if (_elm.Router.values)
+   return _elm.Router.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Router",
+   $Basics = Elm.Basics.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $String = Elm.String.make(_elm);
+   _op[":->"] = F2(function (v0,
+   v1) {
+      return {ctor: "_Tuple2"
+             ,_0: v0
+             ,_1: v1};
+   });
+   var matchPrefix = F2(function (prefix,
+   string) {
+      return A2($String.startsWith,
+      prefix,
+      string) ? $Maybe.Just(A2($String.dropLeft,
+      $String.length(prefix),
+      string)) : $Maybe.Nothing;
+   });
+   var match = F3(function (routers,
+   defaultRoute,
+   url) {
+      return function () {
+         switch (routers.ctor)
+         {case "::":
+            switch (routers._0.ctor)
+              {case "_Tuple2":
+                 return _U.eq(routers._0._0,
+                   "") || _U.eq(routers._0._0,
+                   "/") ? _U.eq(url,
+                   routers._0._0) ? routers._0._1(url) : A3(match,
+                   routers._1,
+                   defaultRoute,
+                   url) : function () {
+                      var _v5 = A2(matchPrefix,
+                      routers._0._0,
+                      url);
+                      switch (_v5.ctor)
+                      {case "Just":
+                         return routers._0._1(_v5._0);
+                         case "Nothing": return A3(match,
+                           routers._1,
+                           defaultRoute,
+                           url);}
+                      _U.badCase($moduleName,
+                      "between lines 94 and 104");
+                   }();}
+              break;
+            case "[]":
+            return defaultRoute(url);}
+         _U.badCase($moduleName,
+         "between lines 81 and 104");
+      }();
+   });
+   _elm.Router.values = {_op: _op
+                        ,match: match
+                        ,matchPrefix: matchPrefix};
+   return _elm.Router.values;
+};
 Elm.Set = Elm.Set || {};
 Elm.Set.make = function (_elm) {
    "use strict";
@@ -9362,7 +9573,9 @@ Elm.SignalCatalog.make = function (_elm) {
    $moduleName = "SignalCatalog",
    $Basics = Elm.Basics.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $History = Elm.History.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Router = Elm.Router.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Signal$Stream = Elm.Signal.Stream.make(_elm),
    $SignalDemo = Elm.SignalDemo.make(_elm),
@@ -9371,6 +9584,40 @@ Elm.SignalCatalog.make = function (_elm) {
    $Time = Elm.Time.make(_elm),
    $TimeDemo = Elm.TimeDemo.make(_elm),
    $View = Elm.View.make(_elm);
+   var routing = function (_v0) {
+      return function () {
+         switch (_v0.ctor)
+         {case "_Tuple5":
+            return function () {
+                 var taskPage = $Basics.always(_v0._4);
+                 var extraPage = $Basics.always(_v0._3);
+                 var timePage = $Basics.always(_v0._2);
+                 var signalPage = $Basics.always(_v0._1);
+                 var allCagalog = A2($Router.match,
+                 _L.fromArray([A2($Router._op[":->"],
+                              "/",
+                              signalPage)
+                              ,A2($Router._op[":->"],
+                              "/Time",
+                              timePage)
+                              ,A2($Router._op[":->"],
+                              "/Extra",
+                              extraPage)
+                              ,A2($Router._op[":->"],
+                              "/TaskSignal",
+                              taskPage)]),
+                 signalPage);
+                 return allCagalog(_v0._0);
+              }();}
+         _U.badCase($moduleName,
+         "between lines 72 and 82");
+      }();
+   };
+   var requestPage = $Signal.mailbox("/");
+   var pageChange = Elm.Native.Task.make(_elm).performSignal("pageChange",
+   A2($Signal.map,
+   $History.setPath,
+   requestPage.signal));
    var sendLine2 = $Signal.mailbox(0);
    var sendCount2 = Elm.Native.Task.make(_elm).performSignal("sendCount2",
    A2($Signal.map,
@@ -9388,7 +9635,7 @@ Elm.SignalCatalog.make = function (_elm) {
             case "Nothing":
             return $Task.fail("");}
          _U.badCase($moduleName,
-         "between lines 25 and 27");
+         "between lines 29 and 31");
       }();
    },
    $Signal$Stream.fromSignal($SignalDemo.clickCount)));
@@ -9405,7 +9652,7 @@ Elm.SignalCatalog.make = function (_elm) {
             case "Nothing":
             return $Task.fail("");}
          _U.badCase($moduleName,
-         "between lines 21 and 23");
+         "between lines 25 and 27");
       }();
    },
    $Signal$Stream.fromSignal($SignalDemo.clickCount)));
@@ -9440,19 +9687,37 @@ Elm.SignalCatalog.make = function (_elm) {
    $Graphics$Element.down,
    _L.fromArray([$View.title("Signal and Task")
                 ,$View.demoList(_L.fromArray([taskDemo1]))]));
-   var all = A2($View.signalFlow,
-   $Graphics$Element.down,
-   _L.fromArray([$SignalDemo.signalDemo
-                ,$TimeDemo.timeDemo
-                ,$SignalExtraDemo.signalExtraDemo
-                ,taskSignalDemo]));
-   var main = all;
+   var signals = A2($Signal._op["~"],
+   A2($Signal._op["~"],
+   A2($Signal._op["~"],
+   A2($Signal._op["~"],
+   A2($Signal._op["<~"],
+   F5(function (v0,v1,v2,v3,v4) {
+      return {ctor: "_Tuple5"
+             ,_0: v0
+             ,_1: v1
+             ,_2: v2
+             ,_3: v3
+             ,_4: v4};
+   }),
+   $History.path),
+   $SignalDemo.signalDemo),
+   $TimeDemo.timeDemo),
+   $SignalExtraDemo.signalExtraDemo),
+   taskSignalDemo);
+   var routingElement = A2($Signal._op["<~"],
+   routing,
+   signals);
+   var main = routingElement;
    _elm.SignalCatalog.values = {_op: _op
                                ,sendLine1: sendLine1
                                ,sendLine2: sendLine2
                                ,taskDemo1: taskDemo1
                                ,taskSignalDemo: taskSignalDemo
-                               ,all: all
+                               ,signals: signals
+                               ,requestPage: requestPage
+                               ,routing: routing
+                               ,routingElement: routingElement
                                ,main: main};
    return _elm.SignalCatalog.values;
 };

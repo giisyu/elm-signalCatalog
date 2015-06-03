@@ -4,13 +4,17 @@ import Signal.Stream as Stream
 import Signal exposing (..)
 import Task exposing (..)
 import Time exposing (..)
-import Graphics.Element as Element exposing (down,Element)
+import Graphics.Element as Element exposing (down,Element,show)
 
 
 import View exposing (..)
 import TimeDemo exposing (..)
 import SignalDemo exposing(..)
 import SignalExtraDemo exposing (..) 
+
+import Router exposing (..)
+import History exposing (..)
+
 
 --taskDemo
 
@@ -53,14 +57,32 @@ taskSignalDemo =
 
 ------all
 
-all : Signal Element
-all =
-  signalFlow down [
-                        signalDemo
-                        ,timeDemo
-                        ,signalExtraDemo
-                        ,taskSignalDemo
-                        ]
+signals = (,,,,) <~ path 
+                ~ signalDemo 
+                ~ timeDemo
+                ~ signalExtraDemo
+                ~ taskSignalDemo
+
+requestPage = Signal.mailbox "/"
+
+port pageChange : Signal ( Task x () )
+port pageChange = Signal.map setPath requestPage.signal
+
+routing (pagePath,sig ,time,ex,task) = 
+      let signalPage = (always sig)
+          timePage = always time
+          extraPage = always ex
+          taskPage = always task
+          allCagalog = 
+              match 
+                 [ "/" :-> signalPage
+                 , "/Time" :-> timePage 
+                 , "/Extra" :-> extraPage
+                 , "/TaskSignal" :-> taskPage ] signalPage
+      in allCagalog pagePath
+
+routingElement = routing <~ signals
 
 
-main = all
+
+main = routingElement
