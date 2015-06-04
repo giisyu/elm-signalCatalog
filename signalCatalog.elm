@@ -60,8 +60,9 @@ taskSignalDemo =
 
 
 
-------all
+------
 
+signals :Signal (String,Element,Element,Element,Element)
 signals = (,,,,) <~ path 
                 ~ signalDemo 
                 ~ timeDemo
@@ -73,6 +74,7 @@ requestPage = Signal.mailbox "/"
 port pageChange : Signal ( Task x () )
 port pageChange = Signal.map setPath requestPage.signal
 
+routing : (String,Element,Element,Element,Element) -> Element 
 routing (pagePath,sig ,time,ex,task) = 
       let signalPage = (always sig)
           timePage = always time
@@ -86,17 +88,26 @@ routing (pagePath,sig ,time,ex,task) =
                  , "/TaskSignal" :-> taskPage ] signalPage
       in allCagalog pagePath
 
+routingElement : Signal Element
 routingElement = routing <~ signals
 
+makebutton : (String,String) -> Element
 makebutton (str,path) = 
             let defaultText str =Element.justified <| Text.style Text.defaultStyle <| Text.fromString str
                 ele = container 140 20 middle (defaultText str)
                 foverEle = Element.color (Color.blue) ele
                 downEle = Element.color (Color.gray) ele
             in customButton (Signal.message requestPage.address path ) ele foverEle downEle  
-                             
+
+buttons :List Element
 buttons = List.map makebutton [("Signal","/"),("Time","/Time"),("elm-signal-extra","/Extra"),("TaskSignal","/TaskSignal")]
+
+button : (Int,Int) -> Element
 button (x,y) = container x 20 middle <| flow right buttons
+
+signalButton : Signal Element
 signalButton = button <~ Window.dimensions
+
+all : Signal Element
 all = signalFlow down [signalButton , routingElement]
 main = all

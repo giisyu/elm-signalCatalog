@@ -14726,7 +14726,7 @@ Elm.SignalCatalog.make = function (_elm) {
                  return allCagalog(_v0._0);
               }();}
          _U.badCase($moduleName,
-         "between lines 77 and 87");
+         "between lines 79 and 89");
       }();
    };
    var requestPage = $Signal.mailbox("/");
@@ -14762,7 +14762,7 @@ Elm.SignalCatalog.make = function (_elm) {
                  downEle);
               }();}
          _U.badCase($moduleName,
-         "between lines 92 and 96");
+         "between lines 96 and 100");
       }();
    };
    var buttons = A2($List.map,
@@ -14790,7 +14790,7 @@ Elm.SignalCatalog.make = function (_elm) {
               $Graphics$Element.right,
               buttons));}
          _U.badCase($moduleName,
-         "on line 99, column 16 to 59");
+         "on line 106, column 16 to 59");
       }();
    };
    var signalButton = A2($Signal._op["<~"],
