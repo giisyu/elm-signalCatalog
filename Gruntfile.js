@@ -21,8 +21,10 @@ module.exports = function(grunt) {
 
     browserSync: {
       dev: {
+        bsFiles : {
+          src : "elm.js"
+        },
           options: {
-          files : "signalCatalog.elm",
           watchTask: true,
           port: 8000,
           server:{

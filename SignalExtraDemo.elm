@@ -208,8 +208,8 @@ relativeTimeDemo = line2
                       tickcount
 
 signalExtraDemo =    
-        signalFlow down [ title "elm-signal-extra"
-                                ,title "Signal.Discrete"
+        signalFlow down [ 
+                                title "Signal.Discrete"
                                 ,functionName "type alias EventSource = Signal ()"
                                 ,demoList [esDemo
                                           ,whenEqualDemo
