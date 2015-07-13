@@ -8,7 +8,7 @@
     ],
     "exposed-modules": [],
     "dependencies": {
-        "Apanatshka/elm-signal-extra": "5.1.0 <= v < 6.0.0",
+        "Apanatshka/elm-signal-extra": "5.1.0 <= v <= 5.1.1",
         "TheSeamau5/elm-history": "1.0.0 <= v < 2.0.0",
         "TheSeamau5/elm-router": "1.0.0 <= v < 2.0.0",
         "circuithub/elm-bootstrap-html": "6.3.0 <= v < 7.0.0",
