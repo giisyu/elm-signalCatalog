@@ -4,7 +4,7 @@ import Signal.Stream as Stream
 import Signal exposing (..)
 import Task exposing (..)
 import Time exposing (..)
-import Graphics.Element as Element exposing (down,Element,show,container,middle,flow,right)
+import Graphics.Element as Element exposing (down,Element,show,container,middle,flow,right,tag,link)
 import Graphics.Input as Input exposing (customButton)
 import Window
 import Signal.Extra as Extra
@@ -21,6 +21,7 @@ import History exposing (..)
 import Html exposing (Html,nav, div,ul,li,text,fromElement,toElement)
 import Html.Attributes exposing (class)
 
+import Debug
 --taskDemo
 
 sendLine1 = Signal.mailbox 0
@@ -62,17 +63,22 @@ taskSignalDemo =
 
 ------
 
+
 signals :Signal (String,Element,Element,Element,Element)
-signals = (,,,,) <~ path 
+signals = (,,,,) <~(Debug.log "hash" <~ hash)
                 ~ signalDemo 
                 ~ timeDemo
                 ~ signalExtraDemo
                 ~ taskSignalDemo
 
-requestPage = Signal.mailbox "/"
 
-port pageChange : Signal ( Task x () )
-port pageChange = Signal.map setPath requestPage.signal
+hashClick =  mailbox Nothing
+
+port set : Signal (Task String ())
+port set = (\x -> case x of   
+                      Just y -> setPath y
+                      Nothing -> Task.fail "" ) <~ hashClick.signal 
+  
 
 routing : (String,Element,Element,Element,Element) -> Element 
 routing (pagePath,sig ,time,ex,task) = 
@@ -82,10 +88,10 @@ routing (pagePath,sig ,time,ex,task) =
           taskPage = always task
           allCagalog = 
               match 
-                 [ "/" :-> signalPage
-                 , "/Time" :-> timePage 
-                 , "/Extra" :-> extraPage
-                 , "/TaskSignal" :-> taskPage ] signalPage
+                 [ "" :-> signalPage
+                 , "#/Time" :-> timePage 
+                 , "#/Extra" :-> extraPage
+                 , "#/TaskSignal" :-> taskPage ] signalPage
       in allCagalog pagePath
 
 routingElement : Signal Element
@@ -95,12 +101,12 @@ makebutton : (String,String) -> Element
 makebutton (str,path) = 
             let defaultText str =Element.justified <| Text.style Text.defaultStyle <| Text.fromString str
                 ele = container 140 20 middle (defaultText str)
-                foverEle = Element.color (Color.blue) ele
-                downEle = Element.color (Color.gray) ele
-            in customButton (Signal.message requestPage.address path ) ele foverEle downEle  
+
+            in  Input.clickable (Signal.message hashClick.address (Just path) ) ele   
+
 
 buttons :List Element
-buttons = List.map makebutton [("Signal","/"),("Time","/Time"),("elm-signal-extra","/Extra"),("TaskSignal","/TaskSignal")]
+buttons = List.map makebutton [("Signal","#/"),("Time","#/Time"),("elm-signal-extra","#/Extra"),("TaskSignal","#/TaskSignal")]
 
 button : (Int,Int) -> Element
 button (x,y) = container x 20 middle <| flow right buttons
