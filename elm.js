@@ -14715,6 +14715,7 @@ Elm.SignalCatalog.make = function (_elm) {
    _L = _N.List.make(_elm),
    $moduleName = "SignalCatalog",
    $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Graphics$Input = Elm.Graphics.Input.make(_elm),
@@ -14759,7 +14760,7 @@ Elm.SignalCatalog.make = function (_elm) {
                  return allCagalog(_v0._0);
               }();}
          _U.badCase($moduleName,
-         "between lines 85 and 95");
+         "between lines 84 and 94");
       }();
    };
    var hashClick = $Signal.mailbox($Maybe.Nothing);
@@ -14773,7 +14774,7 @@ Elm.SignalCatalog.make = function (_elm) {
             case "Nothing":
             return $Task.fail("");}
          _U.badCase($moduleName,
-         "between lines 78 and 80");
+         "between lines 77 and 79");
       }();
    },
    hashClick.signal));
@@ -14790,14 +14791,22 @@ Elm.SignalCatalog.make = function (_elm) {
                  20,
                  $Graphics$Element.middle,
                  defaultText(_v9._0));
-                 return A2($Graphics$Input.clickable,
+                 var elehover = A2($Graphics$Element.color,
+                 A3($Color.rgb,200,200,200),
+                 ele);
+                 var eledown = A2($Graphics$Element.color,
+                 A3($Color.rgb,100,100,100),
+                 ele);
+                 return A4($Graphics$Input.customButton,
                  A2($Signal.message,
                  hashClick.address,
                  $Maybe.Just(_v9._1)),
-                 ele);
+                 ele,
+                 elehover,
+                 eledown);
               }();}
          _U.badCase($moduleName,
-         "between lines 102 and 105");
+         "between lines 101 and 105");
       }();
    };
    var buttons = A2($List.map,

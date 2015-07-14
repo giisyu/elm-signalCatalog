@@ -71,7 +71,6 @@ signals = (,,,,) <~(Debug.log "hash" <~ hash)
                 ~ signalExtraDemo
                 ~ taskSignalDemo
 
-
 hashClick =  mailbox Nothing
 
 port set : Signal (Task String ())
@@ -101,8 +100,9 @@ makebutton : (String,String) -> Element
 makebutton (str,path) = 
             let defaultText str =Element.justified <| Text.style Text.defaultStyle <| Text.fromString str
                 ele = container 140 20 middle (defaultText str)
-
-            in  Input.clickable (Signal.message hashClick.address (Just path) ) ele   
+                elehover = Element.color (Color.rgb 200 200 200) ele 
+                eledown = Element.color (Color.rgb 100 100 100) ele
+            in  Input.customButton (Signal.message hashClick.address (Just path) ) ele elehover eledown   
 
 
 buttons :List Element
